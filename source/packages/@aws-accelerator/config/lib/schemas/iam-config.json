@@ -1,4 +1,4 @@
-{
+	{
   "$ref": "#/definitions/IIamConfig",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
@@ -195,13 +195,13 @@
       "additionalProperties": false,
       "description": "AssumedBy configuration\n\nService principal:",
       "properties": {
-        "externalId": {
-          "$ref": "#/definitions/NonEmptyString",
-          "description": "Type of condition to use for the external ID (if specified)"
-        },
         "conditionKey": {
           "$ref": "#/definitions/NonEmptyString",
-          "description": "Type of condition to use for the external ID (if specified)"
+          "description": "Type of condition to use e.g. StringEquals or StringLike."
+        },
+        "externalId": {
+          "$ref": "#/definitions/NonEmptyString",
+          "description": "The externalId to add to the condition."
         },
         "principal": {
           "$ref": "#/definitions/NonEmptyString",
