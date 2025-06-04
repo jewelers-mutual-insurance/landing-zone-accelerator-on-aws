@@ -460,6 +460,16 @@ export interface IAssumedByConfig {
    * Type of IAM principal type like service, account, principalArn or provider, which can assume this role.
    */
   readonly principal?: t.NonEmptyString;
+
+  /**
+   * Type of condition to use e.g. StringEquals or StringLike.
+   */
+  readonly conditionKey?: t.NonEmptyString;
+
+  /**
+   * The externalId to add to the condition.
+   */
+  readonly externalId?: t.NonEmptyString;
 }
 
 /**

@@ -413,14 +413,30 @@ export class OperationsStack extends AcceleratorStack {
             throw new Error(`The principal defined in arn ${assumedByItem.principal} is too long`);
           }
           if (accountIdRegex.test(assumedByItem.principal)) {
-            principals.push(new cdk.aws_iam.AccountPrincipal(assumedByItem.principal));
+
+            let tempPrincipal = new cdk.aws_iam.AccountPrincipal(assumedByItem.principal);
+            if (assumedByItem.externalId && assumedByItem.conditionKey) {
+              tempPrincipal = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
+              tempPrincipal.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
+            }
+
+            principals.push(tempPrincipal);
           } else if (accountArnRegex.test(assumedByItem.principal)) {
             const accountId = accountArnRegex.exec(assumedByItem.principal);
-            principals.push(new cdk.aws_iam.AccountPrincipal(accountId![1]));
+            let tempPrincipal = new cdk.aws_iam.AccountPrincipal(new cdk.aws_iam.AccountPrincipal(accountId![1]));
+            if (assumedByItem.externalId && assumedByItem.conditionKey) {
+              tempPrincipal = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
+              tempPrincipal.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
+            }
+            principals.push(tempPrincipal);
           } else {
-            principals.push(
-              new cdk.aws_iam.AccountPrincipal(this.props.accountsConfig.getAccountId(assumedByItem.principal)),
-            );
+            let tempPrincipal = new cdk.aws_iam.AccountPrincipal(this.props.accountsConfig.getAccountId(assumedByItem.principal));
+
+            if (assumedByItem.externalId && assumedByItem.conditionKey) {
+              tempPrincipal = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
+              tempPrincipal.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
+            }
+            principals.push(tempPrincipal);
           }
           break;
         case 'provider':

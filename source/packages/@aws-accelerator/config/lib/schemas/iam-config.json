@@ -195,6 +195,14 @@
       "additionalProperties": false,
       "description": "AssumedBy configuration\n\nService principal:",
       "properties": {
+        "externalId": {
+          "$ref": "#/definitions/NonEmptyString",
+          "description": "Type of condition to use for the external ID (if specified)"
+        },
+        "conditionKey": {
+          "$ref": "#/definitions/NonEmptyString",
+          "description": "Type of condition to use for the external ID (if specified)"
+        },
         "principal": {
           "$ref": "#/definitions/NonEmptyString",
           "description": "Type of IAM principal type like service, account, principalArn or provider, which can assume this role."
