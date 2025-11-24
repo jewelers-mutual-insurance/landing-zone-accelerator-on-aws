@@ -138,6 +138,8 @@ export class GroupSetConfig implements i.IGroupSetConfig {
 export class AssumedByConfig implements i.IAssumedByConfig {
   readonly principal: string = '';
   readonly type!: t.AssumedByType;
+  readonly conditionKey: string | undefined = undefined;
+  readonly externalId: string | undefined = undefined;
 }
 
 export class RoleConfig implements i.IRoleConfig {

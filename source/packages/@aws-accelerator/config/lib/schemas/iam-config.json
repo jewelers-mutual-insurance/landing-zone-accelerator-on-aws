@@ -1,4 +1,4 @@
-{
+	{
   "$ref": "#/definitions/IIamConfig",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
@@ -204,6 +204,14 @@
       "additionalProperties": false,
       "description": "AssumedBy configuration\n\nService principal:",
       "properties": {
+        "conditionKey": {
+          "$ref": "#/definitions/NonEmptyString",
+          "description": "Type of condition to use e.g. StringEquals or StringLike."
+        },
+        "externalId": {
+          "$ref": "#/definitions/NonEmptyString",
+          "description": "The externalId to add to the condition."
+        },
         "principal": {
           "$ref": "#/definitions/NonEmptyString",
           "description": "Type of IAM principal type like service, account, principalArn or provider, which can assume this role."

@@ -1,0 +1,100 @@
+From 559a4ca77867dda82ea5afd0c1705528f610781e Mon Sep 17 00:00:00 2001
+From: Dan Ballard <dballard@jminsure.com>
+Date: Wed, 4 Jun 2025 16:10:59 -0400
+Subject: [PATCH] update var logic
+
+---
+ .../lib/stacks/operations-stack.ts            | 34 +++++++++++++------
+ .../config/lib/schemas/iam-config.json        | 10 +++---
+ 2 files changed, 29 insertions(+), 15 deletions(-)
+
+diff --git a/source/packages/@aws-accelerator/accelerator/lib/stacks/operations-stack.ts b/source/packages/@aws-accelerator/accelerator/lib/stacks/operations-stack.ts
+index dffcded3f..60e042df9 100644
+--- a/source/packages/@aws-accelerator/accelerator/lib/stacks/operations-stack.ts
++++ b/source/packages/@aws-accelerator/accelerator/lib/stacks/operations-stack.ts
+@@ -413,30 +413,44 @@ export class OperationsStack extends AcceleratorStack {
+             throw new Error(`The principal defined in arn ${assumedByItem.principal} is too long`);
+           }
+           if (accountIdRegex.test(assumedByItem.principal)) {
+-
+             let tempPrincipal = new cdk.aws_iam.AccountPrincipal(assumedByItem.principal);
++            let tempPrincipalWithConditions;
+             if (assumedByItem.externalId && assumedByItem.conditionKey) {
+-              tempPrincipal = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
+-              tempPrincipal.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
++              tempPrincipalWithConditions = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
++              tempPrincipalWithConditions.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
+             }
+ 
+-            principals.push(tempPrincipal);
++            if (tempPrincipalWithConditions != null) {
++              principals.push(tempPrincipalWithConditions);
++            } else {
++              principals.push(tempPrincipal)
++            }
+           } else if (accountArnRegex.test(assumedByItem.principal)) {
+             const accountId = accountArnRegex.exec(assumedByItem.principal);
+             let tempPrincipal = new cdk.aws_iam.AccountPrincipal(new cdk.aws_iam.AccountPrincipal(accountId![1]));
++            let tempPrincipalWithConditions;
+             if (assumedByItem.externalId && assumedByItem.conditionKey) {
+-              tempPrincipal = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
+-              tempPrincipal.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
++              tempPrincipalWithConditions = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
++              tempPrincipalWithConditions.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
++            }
++            if (tempPrincipalWithConditions != null) {
++              principals.push(tempPrincipalWithConditions);
++            } else {
++              principals.push(tempPrincipal)
+             }
+-            principals.push(tempPrincipal);
+           } else {
+             let tempPrincipal = new cdk.aws_iam.AccountPrincipal(this.props.accountsConfig.getAccountId(assumedByItem.principal));
++            let tempPrincipalWithConditions;
+ 
+             if (assumedByItem.externalId && assumedByItem.conditionKey) {
+-              tempPrincipal = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
+-              tempPrincipal.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
++              tempPrincipalWithConditions = new cdk.aws_iam.PrincipalWithConditions(tempPrincipal, {});
++              tempPrincipalWithConditions.addCondition(assumedByItem.conditionKey, {'sts:ExternalId': assumedByItem.externalId});
++            }
++            if (tempPrincipalWithConditions != null) {
++              principals.push(tempPrincipalWithConditions);
++            } else {
++              principals.push(tempPrincipal)
+             }
+-            principals.push(tempPrincipal);
+           }
+           break;
+         case 'provider':
+diff --git a/source/packages/@aws-accelerator/config/lib/schemas/iam-config.json b/source/packages/@aws-accelerator/config/lib/schemas/iam-config.json
+index 5f70505e0..c487cf6e2 100644
+--- a/source/packages/@aws-accelerator/config/lib/schemas/iam-config.json
++++ b/source/packages/@aws-accelerator/config/lib/schemas/iam-config.json
+@@ -1,4 +1,4 @@
+-{
++	{
+   "$ref": "#/definitions/IIamConfig",
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "definitions": {
+@@ -195,13 +195,13 @@
+       "additionalProperties": false,
+       "description": "AssumedBy configuration\n\nService principal:",
+       "properties": {
+-        "externalId": {
++        "conditionKey": {
+           "$ref": "#/definitions/NonEmptyString",
+-          "description": "Type of condition to use for the external ID (if specified)"
++          "description": "Type of condition to use e.g. StringEquals or StringLike."
+         },
+-        "conditionKey": {
++        "externalId": {
+           "$ref": "#/definitions/NonEmptyString",
+-          "description": "Type of condition to use for the external ID (if specified)"
++          "description": "The externalId to add to the condition."
+         },
+         "principal": {
+           "$ref": "#/definitions/NonEmptyString",
+-- 
+2.50.1 (Apple Git-155)
+
